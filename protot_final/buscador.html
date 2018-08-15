@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Diagnóstico</title>
+		
+		<link href="styles.css" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" href="./jQuery/jquery-ui.min.css" type="text/css" />
+		
+		<script src="./jQuery/jquery-1.8.3.min.js" type="text/javascript"></script>
+		<script src="./jQuery/jquery-ui.min.js" type="text/javascript"></script>
+		
+		<script type="text/javascript">
+			$(function(){
+				var lista_tags=[
+					"Escalofríos",
+					"Mareos",
+					"Sed",
+					"Dolor de cabeza",
+					"Dolor de garganta",
+					"Boca seca",
+					"Tos seca",
+					"Estornudo",
+					"Diarrhea",
+					"Fiebre/Calentura/Temperatura Alta",
+					"Debilidad",
+					"Cólicos abdominales",
+					"Problemas al orinar",
+					"Orina amarilla oscura",
+					"Calambres musculares",
+					"Ojos llorosos",
+					"Mocos/Congestión nasal",
+					"Náuseas/vómito"
+				];
+				
+				var actual_arr=[];
+				var defaulStr="<span style='color:#888;'>(introduzca un síntoma)</span>";
+				
+				function updateList(){
+					var i, len, temp;
+					
+					temp="";
+					
+					for(i=0, len=actual_arr.length; i<len; i++){
+						if(actual_arr[i][1]){
+							temp+="<li>"+actual_arr[i][0]+" <a href='#' class='borrarElm' data-inx='"+i+"'>[x]</a></li>";
+						}
+					}
+					
+					$("#sint_list").html(temp);
+					
+					$(".borrarElm").click(function(){
+						actual_arr.splice($(this).attr("data-inx"), 1);
+						updateList();
+						return false;
+					});
+					
+					$("#envia").removeClass("enviaDisabled");
+					
+					if(!i){
+						$("#envia").addClass("enviaDisabled");
+					}
+					
+					//$("#xtags").attr("value", "");
+				}
+				
+				$("#envia").click(function(){
+					var i, j, len, len2, nstr, temp;
+					
+					nstr="";
+					
+					for(i=0, len=actual_arr.length; i<len; i++){
+						if(actual_arr[i][1]){
+							temp="";
+							
+							for(j=0, len2=lista_tags.length; j<len2; j++){
+								if(actual_arr[i][0]===lista_tags[j]){
+									temp=(""+j);
+									j=999;//no quiero usar break por miedo a que se salga del for del "i" y no quiero usar labels
+								}
+							}
+							
+							if(temp!==""){
+								nstr+=(","+temp);
+							}
+						}
+					}
+					
+					window.location.href=window.location.href.replace("/buscador.html", ("/resultados.html?q="+nstr.substring(1)));
+					
+					return false;
+				});
+				
+				$("#xtags").blur(function(){
+					$("#xtags").val("");
+				});
+				
+				$("#xtags").autocomplete({
+					source : lista_tags,
+					response : function(event, ui){
+						if(!ui.content.length){
+							$("#displ").html("<span style='color:#c93f27;'>(no se encontró el síntoma)<span>");
+						}else{
+							$("#displ").html("<span style='color:#106C36;'>(seleccione para agregar)<span>");
+						}
+					},
+					select : function(event, ui){
+						var i, len, indx, temp, encontrado;
+						
+						indx=-1;
+						
+						for(i=0, len=lista_tags.length; i<len; i++){
+							if(lista_tags[i]===ui.item.value){
+								indx=i;
+								break;
+							}
+						}
+						
+						if(~indx){
+							temp=lista_tags[i];
+						}else{
+							temp="error";
+						}
+						
+						encontrado=false;
+						
+						for(i=0, len=actual_arr.length; i<len; i++){
+							if(actual_arr[i][1] && actual_arr[i][0]===temp){
+								encontrado=true;
+								break;
+							}
+						}
+						
+						if(!encontrado){
+							actual_arr.push([temp, true]);
+						}
+						
+						updateList();
+					}
+				});
+				
+				$("#xtags").on('input', function(e){
+					if($("#xtags").val()===""){
+						$("#displ").html(defaulStr);
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		
+		<!-- Wrapper -->
+		<div id="wrapper">
+			
+			<!-- Header -->
+			<div id="header">
+				<div id="header_holder">
+					<div id="header_content">
+						<a href="index.html"><img src="images/logo.png" alt="diagnostico medico (logo)" style="width:200px;height:64px;"></a>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Menu -->
+			<div id="menu">
+				<div id="menu_holder">
+					<ul>
+						<li class="home"><a href="index.html">Inicio</a></li>
+						<li class="menu_current busq"><a href="buscador.html">Diagnóstico</a></li>
+						<li class="pin" ><a href="cerca.html">Clínicas Cerca</a></li>
+						<li class="enf" ><a href="enfermedades.html">Enfermedades</a></li>
+					</ul>
+					<div class="clear"></div>
+				</div>
+			</div>
+			
+			<!-- Body -->
+			<div id="body">
+				<div id="body_holder">
+					
+					<!-- Content -->
+					<div id="content">
+						<h1>Introduzca sus síntomas:</h1>
+						
+						<div id="cajita">
+							<span>Lista de síntomas:</span>
+							
+							<hr>
+							
+							<ul id="sint_list"></ul>
+							
+							<div class="xentrar"><a href="#" id="envia" class="enviaDisabled">Enviar</a></div>
+							
+							<br>
+						</div>
+						
+						<div class="ui-widget">
+							<input id="xtags"> <span id="displ"><span style='color:#888;'>(introduzca un síntoma)</span></span>
+						</div>
+						
+						<div class="clear"></div>
+				</div>
+			</div>
+			
+			<!-- Footer -->
+			<div id="footer">
+				<div id="footer_holder">
+					<div id="footer_content">
+						<a href="privacidad.html">Privacidad</a> | <a href="contacto.html">Contacto</a>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</body>
+</html>

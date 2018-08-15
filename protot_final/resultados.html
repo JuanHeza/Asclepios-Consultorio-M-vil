@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Resultado del diagnóstico</title>
+		<link href="styles.css" rel="stylesheet" type="text/css" />
+		
+		<script src="./jQuery/jquery-1.8.3.min.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			$(function(){
+				var lista_tags=[
+					["Escalofríos", ["gripe", "intoxicación alimentaria"]],
+					["Mareos", ["gripe"]],
+					["Sed", ["deshidratación"]],
+					["Dolor de cabeza", ["gripe", "intoxicación alimentaria"]],
+					["Dolor de garganta", ["gripe"]],
+					["Boca seca", ["deshidratación"]],
+					["Tos seca", ["gripe"]],
+					["Estornudo", ["gripe", "alergia"]],
+					["Diarrhea", ["intoxicación alimentaria"]],
+					["Fiebre/Calentura/Temperatura Alta", ["intoxicación alimentaria"]],
+					["Debilidad", ["gripe", "intoxicación alimentaria"]],
+					["Cólicos abdominales", ["intoxicación alimentaria"]],
+					["Problemas al orinar", ["deshidratación"]],
+					["Orina amarilla oscura", ["deshidratación"]],
+					["Calambres musculares", ["deshidratación"]],
+					["Ojos llorosos", ["alergia"]],
+					["Mocos/Congestión nasal", ["gripe", "alergia"]],
+					["Náuseas/vómito", ["gripe", "intoxicación alimentaria"]]
+				];
+				
+				function getURLParams(qs){
+					var params, tokens, re;
+					
+					qs=qs.split("+").join(" ");
+					
+					params={};
+					re=/[?&]?([^=]+)=([^&]*)/g;
+					
+					while(tokens=re.exec(qs)){
+						params[decodeURIComponent(tokens[1])]=decodeURIComponent(tokens[2]);
+					}
+					
+					return params;
+				}
+				
+				var i, j, k, len, len2, len3, narr, temp, temp2, singul, estara, arrFinal;
+				
+				temp="";
+				arrFinal=[];
+				narr=getURLParams(document.location.search)["q"].split(",");
+				
+				for(i=0, len=narr.length; i<len; i++){
+					temp+="<li>"+lista_tags[1*narr[i]][0]+"</li>";
+					
+					for(k=0, len3=lista_tags[1*narr[i]][1].length; k<len3; k++){
+						estara=-1;
+						
+						for(j=0, len2=arrFinal.length; j<len2; j++){
+							if(lista_tags[1*narr[i]][1][k]===arrFinal[j][0]){
+								estara=j;
+								j=999;//no quiero usar break por miedo a que se salga del for del "i" o "k" y no quiero usar labels
+							}
+						}
+						
+						if(!~estara){
+							arrFinal.push([lista_tags[1*narr[i]][1][k], 1]);
+						}else{
+							arrFinal[estara][1]=(1+arrFinal[estara][1]);
+						}
+					}
+				}
+				
+				temp2="";
+				
+				arrFinal.sort(function(a, b){return b[1]-a[1]});
+				
+				for(i=0, len=arrFinal.length; i<len; i++){
+					singul=(arrFinal[i][1]===1);
+					
+					temp2+="<li>"+arrFinal[i][0]+" <span class='grei'>("+arrFinal[i][1]+" síntoma"+(singul ? "" : "s")+" coincide"+(singul ? "" : "n")+")<span></li>";
+				}
+				
+				$("#pre_list").html(temp);
+				$("#res_list").html(temp2);
+			});
+		</script>
+	</head>
+	<body>
+		
+		<!-- Wrapper -->
+		<div id="wrapper">
+			
+			<!-- Header -->
+			<div id="header">
+				<div id="header_holder">
+					<div id="header_content">
+						<a href="index.html"><img src="images/logo.png" alt="diagnostico medico (logo)" style="width:200px;height:64px;"></a>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Menu -->
+			<div id="menu">
+				<div id="menu_holder">
+					<ul>
+						<li class="home"><a href="index.html">Inicio</a></li>
+						<li class="menu_current busq"><a href="buscador.html">Diagnóstico</a></li>
+						<li class="pin" ><a href="cerca.html">Clínicas Cerca</a></li>
+						<li class="enf" ><a href="enfermedades.html">Enfermedades</a></li>
+					</ul>
+					<div class="clear"></div>
+				</div>
+			</div>
+			
+			<!-- Body -->
+			<div id="body">
+				<div id="body_holder">
+					
+					<!-- Content -->
+					<div id="content">
+						<h1>Resultado del diagnóstico:</h1>
+						
+						<strong>Para los síntomas:</strong>
+						<ul id="pre_list"></ul>
+						
+						<br>
+						<br>
+						
+						<strong>El diagnóstico más probable es:</strong>
+						<ul id="res_list"><li>a</li><li>a</li><li>a</li></ul>
+						
+						<br>
+						
+						<div class="botones xentrar"><a href="buscador.html">Regresar</a></div>
+				</div>
+			</div>
+			
+			<!-- Footer -->
+			<div id="footer">
+				<div id="footer_holder">
+					<div id="footer_content">
+						<a href="privacidad.html">Privacidad</a> | <a href="contacto.html">Contacto</a>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</body>
+</html>
